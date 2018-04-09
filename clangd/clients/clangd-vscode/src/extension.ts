@@ -38,6 +38,23 @@ export function activate(context: vscode.ExtensionContext) {
         synchronize: !syncFileEvents ? undefined : {
             fileEvents: vscode.workspace.createFileSystemWatcher(filePattern)
         },
+	// NOTE(croot): adding middleware to not use definitions.
+	// This is so that the Microsoft/vscode-cpptools extension
+	// plays nice with this.
+        // TODO(croot): we should check if the vscode-cpptools extension is activated
+        // because if it isn't, then we don't want to deactivate the definitions
+        // here
+        middleware: {
+            provideDefinition: (a, b, c) => {
+                return null;
+            },
+            provideHover: (a, b, c) => {
+                return null;
+            }
+            // provideRenameEdits: (a, b, c, d) => {
+            //     return null;
+            // }
+        },
         // Resolve symlinks for all files provided by clangd.
         // This is a workaround for a bazel + clangd issue - bazel produces a symlink tree to build in,
         // and when navigating to the included file, clangd passes its path inside the symlink tree
